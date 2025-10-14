@@ -26,8 +26,8 @@ jobs:
 
       - name: Print the commit ID
         run: |
-          echo "${IMAGE_TAG}"
-          echo "$GITHUB_ENV"
+          echo "IMAGE TAG IS $IMAGE_TAG"
+          echo "GITHUB ENV IS $GITHUB_ENV"
 
       # 3️⃣ Build and Push Backend
       - name: Build image
