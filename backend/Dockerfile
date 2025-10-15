@@ -1,16 +1,20 @@
-FROM node:18-alpine
+FROM node:18-alpine. AS builder
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
 RUN npm install 
 
-COPY . .
+COPY app.js .
 
-# Run as non-root for security
-RUN addgroup app && adduser -S -G app app
-USER app
+FROM gcr.io/distroless/nodejs18
+
+WORKDIR /usr/src/app
+
+COPY --from=builder /usr/src/app /usr/src/app
+
+USER nonroot
 
 EXPOSE 5000
-CMD ["npm", "start"]
+CMD ["app.js"]
 
