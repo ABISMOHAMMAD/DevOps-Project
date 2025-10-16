@@ -1,0 +1,18 @@
+# Terraform files
+.terraform/
+*.tfstate
+*.tfstate.backup
+crash.log
+override.tf
+override.tf.json
+*.tfvars
+*.tfvars.json
+*.zip
+
+# Sensitive keys / credentials
+*.pem
+*.key
+
+# OS and editor stuff
+.DS_Store
+*.swp
