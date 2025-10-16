@@ -2,7 +2,6 @@ resource "aws_instance" "bastion_host" {
   ami                    = var.ami
   instance_type          = var.instance_type
   subnet_id              = aws_subnet.private_subnet[0].id
-  key_name               = aws_key_pair.bastion_key_pair.key_name
   iam_instance_profile   = aws_iam_instance_profile.bastion_ec2_profile.name
   vpc_security_group_ids = [aws_security_group.security_group.id]
 
@@ -38,11 +37,6 @@ resource "aws_instance" "bastion_host" {
 }
 
 
-resource "aws_key_pair" "bastion_key_pair" {
 
-  key_name   = "${local.project}-bastion-key"
-  public_key = file("/Users/mohammadabis/.ssh/id_rsa.pub")
-
-}
 
 
