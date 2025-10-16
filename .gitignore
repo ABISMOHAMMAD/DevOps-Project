@@ -1,18 +1,26 @@
-# Terraform files
-.terraform/.terraform
-*.tfstate
-*.tfstate.backup
+# Ignore Terraform plugin and cache folders anywhere
+**/.terraform/*
+**/.terraform.lock.hcl
+
+# Ignore Terraform state files
+**/*.tfstate
+**/*.tfstate.backup
+
+# Ignore tfvars (potentially sensitive)
+**/*.tfvars
+**/*.tfvars.json
+
+# Ignore crash logs and backups
 crash.log
 override.tf
 override.tf.json
-*.tfvars
-*.tfvars.json
-*.zip
+*_override.tf
+*_override.tf.json
 
-# Sensitive keys / credentials
-*.pem
-*.key
+# Ignore local .zip or plan files
+**/*.zip
+**/*.plan
 
-# OS and editor stuff
+# Ignore OS/editor junk
 .DS_Store
 *.swp
