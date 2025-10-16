@@ -5,6 +5,24 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      tfvars_file:
+        description: "Path to the .tfvars file"
+        required: true
+        default: "terraform.tfvars"
+      action:
+        type: choice
+        description: "Defines the terraform Actions"
+        options:
+          - plan
+          - apply
+          - destroy
+        default: "plan"
+
+env:
+  AWS_REGION: us-east-1
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
   build:
@@ -41,3 +59,47 @@ jobs:
           docker push ${{secrets.DOCKERHUB_USERNAME}}/frontend-app:$IMAGE_TAG
           docker push ${{secrets.DOCKERHUB_USERNAME}}/backend-app:$IMAGE_TAG
           docker push ${{secrets.DOCKERHUB_USERNAME}}/mongo-app:$IMAGE_TAG
+
+  terraform:
+    name: Terraform ${{ github.event.inputs.action }}
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: terraform
+
+    needs: build
+    steps:
+      # 1️⃣ Checkout source code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.1.7"
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -diff
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        if: ${{ github.event.inputs.action == 'plan' }}
+        run: |
+          terraform plan -var-file=${{ github.event.inputs.tfvars_file }} -input=false
+
+      - name: Terraform Apply
+        if: ${{ github.event.inputs.action == 'apply' }}
+        run: |
+          terraform apply -auto-approve -var-file=${{ github.event.inputs.tfvars_file }} -input=false
+
+      - name: Terraform Destroy
+        if: ${{ github.event.inputs.action == 'destroy' }}
+        run: |
+          terraform destroy -auto-approve -var-file=${{ github.event.inputs.tfvars_file }} -input=false
