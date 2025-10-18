@@ -40,7 +40,7 @@ jobs:
 
             - name: Extract the IMAGE_TAG
               run: |
-                  echo "IMAGE_TAG=${github_sha::7}" >> $GITHUB_ENV
+                  echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
             - name: Print the IMAGE TAG
               run: echo "IMAGE TAG is $IMAGE_TAG"
