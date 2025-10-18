@@ -50,3 +50,9 @@ jobs:
                   docker build -t ${{env.ECR_REPOSITORY}}/frontend-app:$IMAGE_TAG ./frontend
                   docker build -t ${{env.ECR_REPOSITORY}}/backend-app:$IMAGE_TAG ./backend
                   docker build -t ${{env.ECR_REPOSITORY}}/mongo-app:$IMAGE_TAG ./mongo
+
+            - name: Push the Image to the ECR repository
+              run: |
+                  docker push ${{env.ECR_REPOSITORY}}/frontend-app:$IMAGE_TAG 
+                  docker push ${{env.ECR_REPOSITORY}}/backend-app:$IMAGE_TAG
+                  docker push ${{env.ECR_REPOSITORY}}/mongo-app:$IMAGE_TAG
