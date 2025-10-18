@@ -52,11 +52,17 @@ jobs:
                   docker build -t ${{env.ECR_REPOSITORY}}/backend-app:$IMAGE_TAG ./backend
                   docker build -t ${{env.ECR_REPOSITORY}}/mongo-app:$IMAGE_TAG ./mongo
 
+            - name: Tag the image as latest IMAGES
+              run: |
+                  docker tag ${{env.ECR_REPOSITORY}}/mongo-app:$IMAGE_TAG ${{env.ECR_REPOSITORY}}/mongo-app:latest
+                  docker tag ${{env.ECR_REPOSITORY}}/frontend-app:$IMAGE_TAG ${{env.ECR_REPOSITORY}}/frontend-app:latest
+                  docker tag ${{env.ECR_REPOSITORY}}/backend-app:$IMAGE_TAG  ${{env.ECR_REPOSITORY}}/backend-app:latest
+
             - name: Push the Image to the ECR repository
               run: |
-                  docker push ${{env.ECR_REPOSITORY}}/frontend-app:$IMAGE_TAG 
-                  docker push ${{env.ECR_REPOSITORY}}/backend-app:$IMAGE_TAG
-                  docker push ${{env.ECR_REPOSITORY}}/mongo-app:$IMAGE_TAG
+                  docker push ${{env.ECR_REPOSITORY}}/frontend-app:latest
+                  docker push ${{env.ECR_REPOSITORY}}/backend-app:latest
+                  docker push ${{env.ECR_REPOSITORY}}/mongo-app:latest
 
     trigger-workflow02:
         needs: build
