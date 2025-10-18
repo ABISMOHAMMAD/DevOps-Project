@@ -65,6 +65,6 @@ jobs:
             - name: Trigger Workflow02
               uses: peter-evans/repository-dispatch@v2
               with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: ${{ secrets.PAT_TOKEN }}
                   repository: ABISMOHAMMAD/DevOps-Project
                   event-type: trigger-workflow02
