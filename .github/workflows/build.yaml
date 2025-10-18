@@ -65,5 +65,3 @@ jobs:
                   repository: ABISMOHAMMAD/DevOps-Project
                   workflow: deploy.yaml
                   ref: main
-                  inputs:
-                      image_tag: ${{env.IMAGE_TAG}}

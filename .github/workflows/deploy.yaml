@@ -1,14 +1,13 @@
 name: Build and Push Image
 
 on:
-    workflow_dispatch:
-        inputs:
-            image_tag:
-                description: "Image tag for the application images"
-                required: true
+    repository_dispatch:
+        types:
+            - trigger-workflow02
 
 env:
     AWS_REGION: ap-south-1
+    ECR_REPOSITORY: 618283574186.dkr.ecr.ap-south-1.amazonaws.com/abismohammad
 
 permissions:
     id-token: write
@@ -54,6 +53,12 @@ jobs:
 
             - name: Terraform Apply
               run: terraform plan -auto-approve -var-file='terraform.tfvars' -input=false
+
+            - name: Pull ECR IMAGES
+              run: |
+                  docker pull ${{env.ECR_REPOSITORY}}/frontend-app 
+                  docker pull ${{env.ECR_REPOSITORY}}/backend-app
+                  docker pull ${{env.ECR_REPOSITORY}}/mongo-app
 
             # 5️⃣ Configure kubectl
             - name: Update kubeconfig
