@@ -13,6 +13,7 @@ env:
 permissions:
     id-token: write
     contents: read
+    actions: write
 
 jobs:
     build:
@@ -56,3 +57,13 @@ jobs:
                   docker push ${{env.ECR_REPOSITORY}}/frontend-app:$IMAGE_TAG 
                   docker push ${{env.ECR_REPOSITORY}}/backend-app:$IMAGE_TAG
                   docker push ${{env.ECR_REPOSITORY}}/mongo-app:$IMAGE_TAG
+
+            - name: Trigger CD pipeline
+              uses: peter-evans/workflow-dispatch@v2
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  repository: ABISMOHAMMAD/DevOps-Project
+                  workflow: deploy.yaml
+                  ref: main
+                  inputs:
+                      image_tag: ${{env.IMAGE_TAG}}

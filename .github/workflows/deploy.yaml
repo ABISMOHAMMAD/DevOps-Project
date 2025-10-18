@@ -1,0 +1,71 @@
+name: Build and Push Image
+
+on:
+    workflow_dispatch:
+        inputs:
+            image_tag:
+                description: "Image tag for the application images"
+                required: true
+
+env:
+    AWS_REGION: ap-south-1
+
+permissions:
+    id-token: write
+    contents: read
+
+jobs:
+    terraform:
+        name: Terraform by EKS Cluster
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                shell: bash
+                working-directory: terraform
+
+        steps:
+            # 1️⃣ Checkout source code
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: "1.1.7"
+
+            - name: Authenticate against AWS using OIDC credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  role-to-assume: arn:aws:iam::618283574186:role/Github_CD_Role
+                  aws-region: ${{env.AWS_REGION}}
+
+            - name: Check identity
+              run: aws sts get-caller-identity
+
+            - name: Terraform Init
+              run: terraform init
+
+            - name: Terraform Format Check
+              run: terraform fmt -check -diff
+
+            - name: Terraform Validate
+              run: terraform validate
+
+            - name: Terraform Apply
+              run: terraform plan -auto-approve -var-file='terraform.tfvars' -input=false
+
+            # 5️⃣ Configure kubectl
+            - name: Update kubeconfig
+              run: aws eks update-kubeconfig --region $AWS_REGION --name my-eks-cluster
+
+            # 6️⃣ Deploy Kubernetes App
+            - name: Deploy to EKS
+              run: |
+                  kubectl set image deployment/frontend frontend=$ECR_REGISTRY/$FRONTEND_REPO:${{ github.event.inputs.image_tag }}
+                  kubectl set image deployment/backend backend=$ECR_REGISTRY/$BACKEND_REPO:${{ github.event.inputs.image_tag }}
+                  kubectl set image deployment/mongo mongo=$ECR_REGISTRY/$MONGO_REPO:${{ github.event.inputs.image_tag }}
+
+            # 7️⃣ Verify deployment
+            - name: Verify Pods
+              run: kubectl get pods -n default
