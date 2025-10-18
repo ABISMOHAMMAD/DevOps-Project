@@ -1,23 +1,23 @@
 name: Build and Push Image
 
-on:
-  # push:
-  #   branches:
-  #     - main
-  workflow_dispatch:
-    inputs:
-      tfvars_file:
-        description: "Path to the .tfvars file"
-        required: true
-        default: "terraform.tfvars"
-      action:
-        type: choice
-        description: "Defines the terraform Actions"
-        options:
-          - plan
-          - apply
-          - destroy
-        default: "plan"
+# on:
+#   push:
+#     branches:
+#       - main
+#   workflow_dispatch:
+#     inputs:
+#       tfvars_file:
+#         description: "Path to the .tfvars file"
+#         required: true
+#         default: "terraform.tfvars"
+#       action:
+#         type: choice
+#         description: "Defines the terraform Actions"
+#         options:
+#           - plan
+#           - apply
+#           - destroy
+#         default: "plan"
 
 env:
   AWS_REGION: ap-south-1
