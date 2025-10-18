@@ -58,10 +58,13 @@ jobs:
                   docker push ${{env.ECR_REPOSITORY}}/backend-app:$IMAGE_TAG
                   docker push ${{env.ECR_REPOSITORY}}/mongo-app:$IMAGE_TAG
 
-            - name: Trigger CD pipeline
-              uses: peter-evans/workflow-dispatch@v2
+    trigger-workflow02:
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+            - name: Trigger Workflow02
+              uses: peter-evans/repository-dispatch@v2
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
                   repository: ABISMOHAMMAD/DevOps-Project
-                  workflow: deploy.yaml
-                  ref: main
+                  event-type: trigger-workflow02
