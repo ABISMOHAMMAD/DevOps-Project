@@ -43,6 +43,6 @@ jobs:
 
             - name: Build the image for three tier application
               run: |
-                  docker build -t ${{ECR_REPOSITORY}}/frontend-app:$IMAGE_TAG ./frontend
-                  docker build -t ${{ECR_REPOSITORY}}/backend-app:$IMAGE_TAG ./backend
-                  docker build -t ${{ECR_REPOSITORY}}/mongo-app:$IMAGE_TAG ./mongo
+                  docker build -t ${{env.ECR_REPOSITORY}}/frontend-app:$IMAGE_TAG ./frontend
+                  docker build -t ${{env.ECR_REPOSITORY}}/backend-app:$IMAGE_TAG ./backend
+                  docker build -t ${{env.ECR_REPOSITORY}}/mongo-app:$IMAGE_TAG ./mongo
