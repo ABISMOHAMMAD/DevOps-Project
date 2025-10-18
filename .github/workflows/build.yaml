@@ -1,0 +1,45 @@
+name: Build and push the image
+
+on: push
+
+env:
+    AWS_REGION: ap-south-1
+    AWS_ACCOUNT: 618283574186
+    ECR_REPOSITORY: ${{env.AWS_ACCOUNT}}.dkr.ecr.${{env.AWS_REGION}}.amazonaws.com/abismohammad/
+
+permissions:
+    id-token: write
+    contents: read
+
+jobs:
+    build:
+        name: Build the Image and Push to ECR_REPOSITORY
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                shell: bash
+                working-directory: .
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Authenticate against AWS using OIDC credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  role-to-assume: arn:aws:iam::618283574186:role/Github-CI-role
+                  aws-region: ${{env.AWS_REGION}}
+
+            - name: Extract the IMAGE_TAG
+              run: |
+                  echo "IMAGE_TAG=${GITHUB.SHA::7}" >> $GITHUB_ENV
+
+            - name: Print the IMAGE TAG
+              run: echo "$IMAGE_TAG"
+
+            - name: Build the image for three tier application
+              run: |
+                  docker build -t ${{env.ECR_REPOSITORY}}/frontend-app/ ./frontend
+                  docker build -t ${{env.ECR_REPOSITORY}}/backend-app/ ./backend
+                  docker build -t ${{env.ECR_REPOSITORY}}/mongo-app/ ./mongo

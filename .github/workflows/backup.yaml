@@ -1,9 +1,9 @@
 name: Build and Push Image
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   workflow_dispatch:
     inputs:
       tfvars_file:
@@ -20,9 +20,9 @@ on:
         default: "plan"
 
 env:
-  AWS_REGION: us-east-1
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ap-south-1
+  AWS_ACCOUNT: 618283574186
+  ECR_REPOSITORY: ${{env.AWS_ACCOUNT}}.dkr.ecr.${{env.AWS_REGION}}.amazonaws.com/abismohammad/
 
 jobs:
   build:
