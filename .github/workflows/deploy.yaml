@@ -52,7 +52,7 @@ jobs:
               run: terraform validate
 
             - name: Terraform Apply
-              run: terraform plan -auto-approve -var-file='terraform.tfvars' -input=false
+              run: terraform plan -var-file='terraform.tfvars' -input=false
 
             - name: Pull ECR IMAGES
               run: |
