@@ -54,6 +54,10 @@ jobs:
             - name: Terraform Apply
               run: terraform plan -var-file='terraform.tfvars' -input=false
 
+            - name: Login to Amazon ECR
+              id: login-ecr
+              uses: aws-actions/amazon-ecr-login@v2
+
             - name: Pull ECR IMAGES
               run: |
                   docker pull ${{env.ECR_REPOSITORY}}/frontend-app 
