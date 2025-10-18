@@ -8,7 +8,7 @@ on:
 
 env:
     AWS_REGION: ap-south-1
-    ECR_REPOSITORY: 618283574186.dkr.ecr.ap-south-1.amazonaws.com/abismohammad/
+    ECR_REPOSITORY: 618283574186.dkr.ecr.ap-south-1.amazonaws.com/abismohammad
 
 permissions:
     id-token: write
