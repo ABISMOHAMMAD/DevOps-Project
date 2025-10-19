@@ -58,17 +58,13 @@ jobs:
                   CLUSTER_NAME=$(aws eks list-clusters --region $AWS_REGION --query "clusters[?starts_with(@, 'Demo-eks-cluster')]" --output text)
                   aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
-            - name: Change directory to k8s manifests
-              run: |
-                  echo 
-                  cd ..
-
             - name: Login to Amazon ECR
               id: login-ecr
               uses: aws-actions/amazon-ecr-login@v2
 
             - name: Deploy to EKS
               run: |
+                  cd ..
                   kubectl apply -f k8s/*
 
             - name: Verify Pods
