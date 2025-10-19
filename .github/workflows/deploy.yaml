@@ -51,7 +51,7 @@ jobs:
               run: terraform validate
 
             - name: Terraform Apply
-              run: terraform apply -auto-approve -var-file='terraform.tfvars' -input=false
+              run: terraform destroy -auto-approve -var-file='terraform.tfvars' -input=false
 
             - name: Update kubeconfig
               run: |
