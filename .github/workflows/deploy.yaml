@@ -24,7 +24,6 @@ jobs:
                 working-directory: terraform
 
         steps:
-            # 1️⃣ Checkout source code
             - name: Checkout repository
               uses: actions/checkout@v4
 
@@ -52,29 +51,21 @@ jobs:
               run: terraform validate
 
             - name: Terraform Apply
-              run: terraform destroy -auto-approve -var-file='terraform.tfvars' -input=false
+              run: terraform apply -auto-approve -var-file='terraform.tfvars' -input=false
 
-            # - name: Login to Amazon ECR
-            #   id: login-ecr
-            #   uses: aws-actions/amazon-ecr-login@v2
+            - name: Update kubeconfig
+              run: aws eks update-kubeconfig --region $AWS_REGION --name Demo-eks-cluster*
 
-            # - name: Pull ECR IMAGES
-            #   run: |
-            #       docker pull ${{env.ECR_REPOSITORY}}/frontend-app
-            #       docker pull ${{env.ECR_REPOSITORY}}/backend-app
-            #       docker pull ${{env.ECR_REPOSITORY}}/mongo-app
+            - name: Change directory to k8s manifests
+              run: cd ..
 
-            # # 5️⃣ Configure kubectl
-            # - name: Update kubeconfig
-            #   run: aws eks update-kubeconfig --region $AWS_REGION --name my-eks-cluster
+            - name: Login to Amazon ECR
+              id: login-ecr
+              uses: aws-actions/amazon-ecr-login@v2
 
-            # # 6️⃣ Deploy Kubernetes App
-            # - name: Deploy to EKS
-            #   run: |
-            #       kubectl set image deployment/frontend frontend=$ECR_REGISTRY/$FRONTEND_REPO:${{ github.event.inputs.image_tag }}
-            #       kubectl set image deployment/backend backend=$ECR_REGISTRY/$BACKEND_REPO:${{ github.event.inputs.image_tag }}
-            #       kubectl set image deployment/mongo mongo=$ECR_REGISTRY/$MONGO_REPO:${{ github.event.inputs.image_tag }}
+            - name: Deploy to EKS
+              run: |
+                  kubectl apply k8s/*
 
-            # # 7️⃣ Verify deployment
-            # - name: Verify Pods
-            #   run: kubectl get pods -n default
+            - name: Verify Pods
+              run: kubectl get pods -A
