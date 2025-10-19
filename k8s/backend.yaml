@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      initContainers:
+        - name: wait-for-mongo
+          image: busybox:1.36
+          command:
+            [
+              "sh",
+              "-c",
+              "until nc -z mongo-service 27017; do echo waiting for mongo; sleep 5; done;",
+            ]
+      containers:
+        - name: backend-app
+          image: 618283574186.dkr.ecr.ap-south-1.amazonaws.com/abismohammad/backend-app:latest
+          env:
+            - name: MONGO_URL
+              value: mongodb://mongo-service:27017/mydb
+          ports:
+            - containerPort: 5000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
