@@ -94,6 +94,37 @@ resource "aws_iam_role" "bastion_ec2_role" {
   })
 }
 
+
+data "aws_caller_identity" "current" {
+}
+resource "aws_iam_role_policy" "bastion_permissions" {
+  name = "${local.cluster_name}-bastion-access-policy-${random_string.random.result}"
+  role = aws_iam_role.bastion_ec2_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowEKSDescribeCluster"
+        Effect = "Allow"
+        Action = [
+          "eks:DescribeCluster"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowPassNodeRole"
+        Effect = "Allow"
+        Action = [
+          "iam:PassRole"
+        ]
+        Resource = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.cluster_name}-node-role-*"
+      }
+    ]
+  })
+}
+
+
 resource "aws_iam_role_policy_attachment" "node_AmazonSSMManagedInstanceCore" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   role       = aws_iam_role.bastion_ec2_role.name
