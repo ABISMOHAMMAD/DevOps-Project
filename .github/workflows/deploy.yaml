@@ -54,7 +54,9 @@ jobs:
               run: terraform apply -auto-approve -var-file='terraform.tfvars' -input=false
 
             - name: Update kubeconfig
-              run: aws eks update-kubeconfig --region $AWS_REGION --name Demo-eks-cluster*
+              run: |
+                  CLUSTER_NAME=$(aws eks list-clusters --region $AWS_REGION --query "clusters[?starts_with(@, 'Demo-eks-cluster')]" --output text)
+                  aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
             - name: Change directory to k8s manifests
               run: cd ..
