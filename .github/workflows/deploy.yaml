@@ -69,7 +69,7 @@ jobs:
 
             - name: Deploy to EKS
               run: |
-                  kubectl apply k8s/*
+                  kubectl apply -f k8s/*
 
             - name: Verify Pods
               run: kubectl get pods -A
