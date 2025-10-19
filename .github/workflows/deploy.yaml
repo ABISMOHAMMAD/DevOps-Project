@@ -59,7 +59,9 @@ jobs:
                   aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
             - name: Change directory to k8s manifests
-              run: cd ..
+              run: |
+                  echo 
+                  cd ..
 
             - name: Login to Amazon ECR
               id: login-ecr
