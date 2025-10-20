@@ -4,6 +4,16 @@ on:
     repository_dispatch:
         types:
             - trigger-workflow02
+    workflow_dispatch:
+        inputs:
+            action:
+                description: "Terraform action"
+                required: true
+                type: choice
+                options:
+                    - plan
+                    - apply
+                    - destroy
 
 env:
     AWS_REGION: ap-south-1
@@ -48,24 +58,38 @@ jobs:
               run: terraform fmt -check -diff
 
             - name: Terraform Validate
-              run: terraform validate
+              run:
+                  terraform validate
+
+                  # ---------------- PLAN ----------------
+
+            - name: Terraform Plan
+              if: ${{ github.event.client_payload.action == 'plan'  ||  github.event.inputs.action == 'plan' }}
+              run: |
+                  terraform plan -input=false -var-file='terraform.tfvars'
+                  echo "Terraform plan completed. Exiting workflow safely.
+                  exit 0 
+
+
+                      # ---------------- APPLY ----------------
 
             - name: Terraform Apply
-              run: terraform destroy -auto-approve -var-file='terraform.tfvars' -input=false
+              if: ${{  github.event.client_payload.action == 'apply' || github.event.inputs.action == 'apply' }}
+              run:
+                  terraform apply -auto-approve -var-file='terraform.tfvars'
 
-            - name: Update kubeconfig
+                  # ---------------- DESTROY ----------------
+
+            - name: Terraform Destroy
+              if: ${{ github.event.client_payload.action == 'destroy' || github.event.inputs.action == 'destroy' }}
               run: |
-                  CLUSTER_NAME=$(aws eks list-clusters --region $AWS_REGION --query "clusters[?starts_with(@, 'Demo-eks-cluster')]" --output text)
-                  aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+                  echo "⚠️ Destroying infra..."
+                  terraform destroy -auto-approve -var-file='terraform.tfvars'
+                  echo "⚠️ Destroy completed. Exiting workflow."
+                  exit 0
 
-            - name: Login to Amazon ECR
-              id: login-ecr
-              uses: aws-actions/amazon-ecr-login@v2
-
-            - name: Deploy to EKS
-              run: |
-                  cd ..
-                  kubectl apply -f k8s/
-
-            - name: Verify Pods
-              run: kubectl get pods -A
+            # - name: Update kubeconfig
+            #   if: ${{ github.event.client_payload.action == 'apply' || github.event.inputs.action == 'apply' }}
+            #   run: |
+            #       CLUSTER_NAME=$(aws eks list-clusters --region $AWS_REGION --query "clusters[?starts_with(@, 'Demo-eks-cluster')]" --output text)
+            #       aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
