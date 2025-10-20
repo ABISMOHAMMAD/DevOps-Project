@@ -67,7 +67,7 @@ jobs:
               if: ${{ github.event.client_payload.action == 'plan'  ||  github.event.inputs.action == 'plan' }}
               run: |
                   terraform plan -input=false -var-file='terraform.tfvars'
-                  echo "Terraform plan completed. Exiting workflow safely.
+                  echo "Terraform plan completed. Exiting workflow safely."
                   exit 0 
 
 
