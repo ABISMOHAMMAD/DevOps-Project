@@ -33,7 +33,7 @@ spec:
             - containerPort: 5000
           readinessProbe:
             httpGet:
-              path: /api/
+              path: /api/health/
               port: 5000
             initialDelaySeconds: 5
             periodSeconds: 10

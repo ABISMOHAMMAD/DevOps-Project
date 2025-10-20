@@ -74,4 +74,4 @@ jobs:
                   token: ${{ secrets.PAT_TOKEN }}
                   repository: ABISMOHAMMAD/DevOps-Project
                   event-type: trigger-workflow02
-                  client-payload: '{"action": "plan"}'
+                  client-payload: '{"action": "destroy"}'
