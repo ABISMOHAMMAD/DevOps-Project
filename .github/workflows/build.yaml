@@ -13,7 +13,7 @@ on:
                     - plan
                     - apply
                     - destroy
-                default: plan
+                default: destroy
 
 env:
     AWS_REGION: ap-south-1

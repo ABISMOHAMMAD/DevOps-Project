@@ -20,7 +20,8 @@ resource "aws_eks_cluster" "cluster" {
       aws_subnet.private_subnet[0].id,
       aws_subnet.private_subnet[1].id
     ]
-    security_group_ids = [aws_security_group.security_group.id]
+    security_group_ids = [aws_security_group.security_group.id, ]
+
 
   }
 
@@ -38,12 +39,42 @@ resource "aws_eks_cluster" "cluster" {
 }
 
 
+resource "aws_security_group" "eks_security_group" {
+  name        = "${local.project}-eks-sg-vpc"
+  description = "Allow inbound traffic and all outbound traffic"
+  vpc_id      = aws_vpc.vpc.id
+
+
+  tags = {
+    Name = "${local.project}-eks-sg"
+    Env  = "${var.env}"
+  }
+
+  depends_on = [aws_eks_cluster.cluster, ]
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_from_bastion_node" {
+  security_group_id            = aws_security_group.eks_security_group.id
+  referenced_security_group_id = aws_security_group.security_group.id
+  ip_protocol                  = "-1"
+}
+
+
+resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
+  security_group_id = aws_security_group.eks_security_group.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+}
+
+
+
 
 resource "aws_eks_node_group" "node_group_eks" {
   cluster_name    = aws_eks_cluster.cluster.name
   node_group_name = "${local.cluster_name}-node-group-${random_string.random.result}"
   node_role_arn   = aws_iam_role.node_role.arn
   subnet_ids      = aws_subnet.private_subnet[*].id
+
 
   scaling_config {
     desired_size = var.desired_size_node_size
