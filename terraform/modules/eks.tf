@@ -14,11 +14,11 @@ resource "aws_eks_cluster" "cluster" {
 
   vpc_config {
 
-    endpoint_private_access = true
-    endpoint_public_access  = false
+    endpoint_private_access = false
+    endpoint_public_access  = true
     subnet_ids = [
-      aws_subnet.private_subnet[0].id,
-      aws_subnet.private_subnet[1].id
+      aws_subnet.public_subnet[0].id,
+      aws_subnet.public_subnet[1].id
     ]
     security_group_ids = [aws_security_group.security_group.id, ]
 
@@ -73,7 +73,7 @@ resource "aws_eks_node_group" "node_group_eks" {
   cluster_name    = aws_eks_cluster.cluster.name
   node_group_name = "${local.cluster_name}-node-group-${random_string.random.result}"
   node_role_arn   = aws_iam_role.node_role.arn
-  subnet_ids      = aws_subnet.private_subnet[*].id
+  subnet_ids      = aws_subnet.public_subnet[*].id
 
 
   scaling_config {
